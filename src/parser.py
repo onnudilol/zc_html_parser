@@ -31,7 +31,7 @@ def scrape_html(source, trim, dest, lang):
     # this must be r+ mode because a+ doesn't work with beautifulsoup
     with open(source, "r+") as f:
 
-        soup = BeautifulSoup(f, "html.parser")
+        soup = BeautifulSoup(f, "html5lib")
 
         # removes all script and style tags
         for script in soup(["script", "style"]):
@@ -154,4 +154,4 @@ if __name__ == "__main__":
         help="Two letter language code",
     )
     args = parser.parse_args()
-    scrape_html(args.source, args.trim, args.dest)
+    scrape_html(args.source, args.trim, args.dest, args.lang)
