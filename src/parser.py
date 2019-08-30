@@ -26,7 +26,7 @@ def extract_cjk(mixed_string):
     return "".join(jp_only)
 
 
-def scrape_html(source, trim, dest):
+def scrape_html(source, trim, dest, lang):
 
     # this must be r+ mode because a+ doesn't work with beautifulsoup
     with open(source, "r+") as f:
@@ -109,7 +109,7 @@ def scrape_html(source, trim, dest):
 
         # path to save the json file to
         base_dir = os.path.split(f.name)[0]
-        json_file = f"{os.path.splitext(os.path.split(f.name)[1])[0]}.ja.json"
+        json_file = f"{os.path.splitext(os.path.split(f.name)[1])[0]}.{lang}.json"
 
         if dest:
             home = os.getcwd()
@@ -145,6 +145,13 @@ if __name__ == "__main__":
         "--dest",
         type=str,
         help="Output directory relative to PWD.  Defaults to source file directory",
+    )
+    parser.add_argument(
+        "-l",
+        "--lang",
+        type=str,
+        default="ja",
+        help="Two letter language code",
     )
     args = parser.parse_args()
     scrape_html(args.source, args.trim, args.dest)
