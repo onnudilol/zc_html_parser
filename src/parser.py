@@ -1,11 +1,11 @@
-from bs4 import BeautifulSoup
-from nltk.tokenize.util import is_cjk
-from kanji_to_romaji import kanji_to_romaji
-import re
-import os
-import json
 import argparse
-import sys
+import json
+import os
+import re
+
+from bs4 import BeautifulSoup
+from kanji_to_romaji import kanji_to_romaji
+from nltk.tokenize.util import is_cjk
 
 
 def extract_cjk(mixed_string):
