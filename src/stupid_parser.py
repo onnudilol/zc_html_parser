@@ -93,6 +93,7 @@ def main(source, trim, dest, lang):
 
         with open(output_path, "w+") as rj:
             json.dump({file_prefix: tl_json}, rj, ensure_ascii=False, indent=2)
+            rj.write("\n")
 
 
 if __name__ == "__main__":
