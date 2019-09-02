@@ -79,7 +79,7 @@ def main(source, trim, dest, lang):
         # path to save the json file to
         base_dir = os.path.split(old_file.name)[0]
         json_file = (
-            f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}.{lang}.json"
+            f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}{prefix}.json"
         )
 
         if dest:
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         help="Output directory relative to PWD.  Defaults to source file directory",
     )
     parser.add_argument(
-        "-l", "--lang", type=str, default="ja", help="Two letter language code"
+        "-p", "--prefix", type=str, default="", help="Some sort of prefix"
     )
     args = parser.parse_args()
     main(args.source, args.trim, args.dest, args.lang)
