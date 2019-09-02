@@ -25,7 +25,7 @@ def extract_cjk(mixed_string):
     return "".join(jp_only)
 
 
-def main(source, trim, dest, lang):
+def main(source, trim, dest, prefix):
 
     tl_json = {}
     file_name = os.path.split(source)[1]
