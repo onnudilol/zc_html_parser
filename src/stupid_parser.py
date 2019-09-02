@@ -117,4 +117,4 @@ if __name__ == "__main__":
         "-p", "--prefix", type=str, default="", help="Some sort of prefix"
     )
     args = parser.parse_args()
-    main(args.source, args.trim, args.dest, args.lang)
+    main(args.source, args.trim, args.dest, args.prefix)
