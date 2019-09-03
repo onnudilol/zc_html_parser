@@ -49,10 +49,10 @@ def main(source, trim, dest, prefix):
                 strip_punctuation = [s.replace("_", "") for s in camelCase]
                 file_prefix = "".join([split_path[0]] + strip_punctuation)
 
-            # removes everything in the path up to zcs
+            # removes everything in the path up to zenclerk
             else:
                 split_path = file_path.split(os.sep)[1:]
-                split_dirs = split_path[split_path.index("zcs") :]
+                split_dirs = split_path[split_path.index("zenclerk") :]
                 camelCase = [s.title() for s in split_dirs[1:]]
                 strip_punctuation = [s.replace("_", "") for s in camelCase]
                 file_prefix = "".join([split_dirs[0]] + strip_punctuation)
