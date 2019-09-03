@@ -66,7 +66,7 @@ def main(source, trim, dest, prefix):
                         str(
                             re.sub(
                                 japanese,
-                                f"{{{{ {file_prefix}.{romaji} | translate }}}}",
+                                f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
                                 line,
                             )
                         )
