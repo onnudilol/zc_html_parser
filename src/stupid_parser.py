@@ -51,11 +51,10 @@ def main(source, trim, dest, prefix):
 
             # removes everything in the path up to zenclerk
             else:
-                split_path = file_path.split(os.sep)[1:]
-                split_dirs = split_path[split_path.index("zenclerk") :]
-                camelCase = [s.title() for s in split_dirs[1:]]
+                split_path = file_path.split(os.sep)[1:][-3:]
+                camelCase = [s.title() for s in split_path[1:]]
                 strip_punctuation = [s.replace("_", "") for s in camelCase]
-                file_prefix = "".join([split_dirs[0]] + strip_punctuation)
+                file_prefix = "".join([split_path[0]] + strip_punctuation)
 
             for line in old_file:
                 if any([is_cjk(char) for char in line]):
