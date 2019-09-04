@@ -4,8 +4,8 @@ beautifulsoup4==4.8.0
 black==19.3b0
 Click==7.0
 html5lib==1.0.1
-Kanji-to-Romaji==1.0.0
 nltk==3.4.5
+PyYAML==5.1.2
 six==1.12.0
 soupsieve==1.9.3
 toml==0.10.0
