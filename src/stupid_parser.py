@@ -5,6 +5,7 @@ import argparse
 import os
 import json
 import shutil
+import yaml
 
 
 def extract_cjk(mixed_string):
@@ -16,6 +17,8 @@ def extract_cjk(mixed_string):
     :return: A string with only the Japanese parts
     """
     jp_only = []
+    jp_start_index = 0
+    jp_end_index = 0
 
     for char in mixed_string:
 
@@ -27,7 +30,7 @@ def extract_cjk(mixed_string):
 
 def main(source, trim, dest, prefix):
 
-    tl_json = {}
+    tl_dict = {}
     file_name = os.path.split(source)[1]
 
     with open("new_file", "w") as new_file:
@@ -35,6 +38,7 @@ def main(source, trim, dest, prefix):
             # the prefix for the json keys
             file_path = os.path.normpath(old_file.name)
             file_path = file_path.replace(os.path.splitext(file_path)[1], "")
+            file_ext = os.path.splitext(file_name)[1]
 
             # removes a subset of directories from the filepath up to and including the trim argument
             if trim:
@@ -57,42 +61,78 @@ def main(source, trim, dest, prefix):
                 file_prefix = "".join([split_path[0]] + strip_punctuation)
 
             for line in old_file:
+
                 if any([is_cjk(char) for char in line]):
                     japanese = extract_cjk(line)
                     romaji = "_".join(kanji_to_romaji(japanese).split()[:3])
-                    tl_json[romaji] = japanese
-                    new_file.write(
-                        str(
-                            re.sub(
-                                japanese,
-                                f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
-                                line,
+                    tl_dict[romaji] = japanese
+
+                    i18n_tag = {
+                        "html": f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
+                        ".rb": f"t('{romaji}')"
+                    }
+                    if file_ext != ".rb":
+                        new_file.write(
+                            str(
+                                re.sub(
+                                    japanese,
+                                    i18n_tag[file_ext],
+                                    line,
+                                )
                             )
                         )
-                    )
+                    else:
+                        new_file.write(
+                            str(
+                                re.sub(
+                                    f"'{japanese}'",
+                                    i18n_tag[file_ext],
+                                    line,
+                                )
+                            )
+                        )
+
                 else:
                     new_file.write(line)
+
 
         shutil.move(os.path.join(os.getcwd(), "new_file"), source)
 
         # path to save the json file to
         base_dir = os.path.split(old_file.name)[0]
-        json_file = (
-            f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}{prefix}.json"
-        )
+        if file_ext == '.html':
+            i18n_file = (
+                f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}{prefix}.json"
+            )
+            if dest:
+                home = os.getcwd()
+                output_path = os.path.join(home, dest, i18n_file)
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            else:
+                # write out a json file adjacent to the html file
+                json_path = os.path.join(base_dir, i18n_file)
+                output_path = json_path
 
-        if dest:
-            home = os.getcwd()
-            output_path = os.path.join(home, dest, json_file)
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            with open(output_path, "w+") as rj:
+                json.dump({file_prefix: tl_dict}, rj, ensure_ascii=False, indent=2)
+                rj.write("\n")
         else:
-            # write out a json file adjacent to the html file
-            json_path = os.path.join(base_dir, json_file)
-            output_path = json_path
+            i18n_file = (
+                f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}{prefix}.yml"
+            )
 
-        with open(output_path, "w+") as rj:
-            json.dump({file_prefix: tl_json}, rj, ensure_ascii=False, indent=2)
-            rj.write("\n")
+            if dest:
+                home = os.getcwd()
+                output_path = os.path.join(home, dest, i18n_file)
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            else:
+                # write out a json file adjacent to the html file
+                json_path = os.path.join(base_dir, i18n_file)
+                output_path = json_path
+
+            with open(output_path, "w+") as rj:
+                yaml.dump({file_prefix: tl_dict}, rj, encoding='utf-8', allow_unicode=True, default_flow_style=False)
+                rj.write("\n")
 
 
 if __name__ == "__main__":
