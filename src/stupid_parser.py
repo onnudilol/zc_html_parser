@@ -68,7 +68,7 @@ def main(source, trim, dest, prefix):
                     tl_dict[romaji] = japanese
 
                     i18n_tag = {
-                        "html": f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
+                        ".html": f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
                         ".rb": f"t('{romaji}')"
                     }
                     if file_ext != ".rb":
