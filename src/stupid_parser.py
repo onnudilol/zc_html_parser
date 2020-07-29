@@ -135,7 +135,7 @@ def main(source, trim, dest, prefix, key):
                     json_key = key.split('.')
                     romaji_dict = {json_key[-1]: tl_dict}
 
-                    for k in json_key[:-1]:
+                    for k in list(reversed(json_key[:-1])):
                         romaji_dict = {k: romaji_dict}
 
                     json.dump(romaji_dict, rj, ensure_ascii=False, indent=2)
