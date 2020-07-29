@@ -8,6 +8,7 @@ import shutil
 import yaml
 import string
 
+JP_PUNCTUATION = ['（', '）', '−']
 
 def extract_cjk(mixed_string):
     """
@@ -20,11 +21,10 @@ def extract_cjk(mixed_string):
     jp_only = []
     jp_start_index = 0
     jp_end_index = 0
-    jp_punctuation = ['（', '）']
 
     for char in mixed_string:
 
-        if is_cjk(char) or char in jp_punctuation:
+        if is_cjk(char) or char in JP_PUNCTUATION:
             jp_only.append(char)
 
     return "".join(jp_only)
@@ -70,7 +70,7 @@ def main(source, trim, dest, prefix, key):
 
                 if any([is_cjk(char) for char in line]):
                     japanese = extract_cjk(line)
-                    romaji = "_".join(re.sub('[()]', '', kanji_to_romaji(japanese)).split()[:3])
+                    romaji = "_".join(re.sub(f'[()−]', '', kanji_to_romaji(japanese)).split()[:3])
                     tl_dict[romaji] = japanese
 
                     i18n_tag = {
