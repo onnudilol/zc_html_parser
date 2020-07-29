@@ -6,6 +6,7 @@ import os
 import json
 import shutil
 import yaml
+import string
 
 
 def extract_cjk(mixed_string):
@@ -19,16 +20,17 @@ def extract_cjk(mixed_string):
     jp_only = []
     jp_start_index = 0
     jp_end_index = 0
+    jp_punctuation = ['（', '）']
 
     for char in mixed_string:
 
-        if is_cjk(char):
+        if is_cjk(char) or char in jp_punctuation:
             jp_only.append(char)
 
     return "".join(jp_only)
 
 
-def main(source, trim, dest, prefix):
+def main(source, trim, dest, prefix, key):
 
     tl_dict = {}
     file_name = os.path.split(source)[1]
@@ -53,6 +55,10 @@ def main(source, trim, dest, prefix):
                 strip_punctuation = [s.replace("_", "") for s in camelCase]
                 file_prefix = "".join([split_path[0]] + strip_punctuation)
 
+            # sets the translation tag to a manually input key
+            elif key:
+                file_prefix = key
+
             # removes everything in the path up to zenclerk
             else:
                 split_path = file_path.split(os.sep)[1:][-3:]
@@ -64,18 +70,29 @@ def main(source, trim, dest, prefix):
 
                 if any([is_cjk(char) for char in line]):
                     japanese = extract_cjk(line)
-                    romaji = "_".join(kanji_to_romaji(japanese).split()[:3])
+                    romaji = "_".join(re.sub('[()]', '', kanji_to_romaji(japanese)).split()[:3])
                     tl_dict[romaji] = japanese
 
                     i18n_tag = {
                         ".html": f"{{{{ '{file_prefix}.{romaji}' | translate }}}}",
+                        ".js": f"$translate.instant('{file_prefix}.{romaji}')",
                         ".rb": f"t('{romaji}')"
                     }
-                    if file_ext != ".rb":
+                    if file_ext == ".html":
                         new_file.write(
                             str(
                                 re.sub(
                                     japanese,
+                                    i18n_tag[file_ext],
+                                    line,
+                                )
+                            )
+                        )
+                    elif file_ext == ".js":
+                        new_file.write(
+                            str(
+                                re.sub(
+                                    f"'{japanese}'",
                                     i18n_tag[file_ext],
                                     line,
                                 )
@@ -100,7 +117,7 @@ def main(source, trim, dest, prefix):
 
         # path to save the json file to
         base_dir = os.path.split(old_file.name)[0]
-        if file_ext == '.html':
+        if file_ext == '.html' or file_ext == '.js':
             i18n_file = (
                 f"{os.path.splitext(os.path.split(old_file.name)[1])[0]}{prefix}.json"
             )
@@ -114,7 +131,16 @@ def main(source, trim, dest, prefix):
                 output_path = json_path
 
             with open(output_path, "w+") as rj:
-                json.dump({file_prefix: tl_dict}, rj, ensure_ascii=False, indent=2)
+                if key:
+                    json_key = key.split('.')
+                    romaji_dict = {json_key[-1]: tl_dict}
+
+                    for k in json_key[:-1]:
+                        romaji_dict = {k: romaji_dict}
+
+                    json.dump(romaji_dict, rj, ensure_ascii=False, indent=2)
+                else:
+                    json.dump({file_prefix: tl_dict}, rj, ensure_ascii=False, indent=2)
                 rj.write("\n")
         else:
             i18n_file = (
@@ -155,5 +181,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p", "--prefix", type=str, default="", help="Some sort of prefix"
     )
+    parser.add_argument(
+        "-k", "--key", type=str, default="", help="Specify a json key for the translations"
+    )
     args = parser.parse_args()
-    main(args.source, args.trim, args.dest, args.prefix)
+    main(args.source, args.trim, args.dest, args.prefix, args.key)
