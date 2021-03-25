@@ -6,7 +6,7 @@ Click==7.0
 html5lib==1.0.1
 -e git+https://github.com/onnudilol/kanji_to_romaji.git@ed63be0056feb04c9b6ee6dfa9899d41a22c5444#egg=Kanji_to_Romaji
 nltk==3.4.5
-PyYAML==5.1.2
+PyYAML==5.4
 six==1.12.0
 soupsieve==1.9.3
 toml==0.10.0
